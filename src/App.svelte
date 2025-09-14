@@ -32,7 +32,7 @@ let enctype = $state("base64");
 	</select>
 	{#if enctype === "base64"}
 		<button type="button" onclick={() => resultText = to_base64(sourceText)}>인코딩</button>
-		<button type="button" onclick={() => resultText = to_base64(inv_encode(sourceText))}>투명 인코딩</button>
+		<button type="button" onclick={() => resultText = inv_encode(to_base64(sourceText))}>투명 인코딩</button>
 		<button type="button" onclick={() => {
 			try{
 				resultText = from_base64(sourceText)
