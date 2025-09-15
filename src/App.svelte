@@ -6,6 +6,7 @@ await init();
 run();
 let sourceText = $state("");
 let resultText = $state("");
+let memoryText = $state("");
 let enctype = $state("base64");
 </script>
 <main class="container">
@@ -57,4 +58,9 @@ let enctype = $state("base64");
 			<button type="button" onclick={() => navigator.clipboard.writeText(resultText)}>복사</button>
 	</form>
 	<button type="button" onclick={() => sourceText = resultText}>처리 필드로 이동</button>
+	<button type="button" onclick={() => memoryText += resultText}>메모리에 추가</button>
+	<form role="group">
+		<textarea class="memory" placeholder="메모리" bind:value={memoryText}></textarea>
+		<button type="button" onclick={() => navigator.clipboard.writeText(memoryText)}>메모리 복사</button>
+	</form>
 </main>
