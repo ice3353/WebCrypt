@@ -9,12 +9,14 @@ let resultText = $state("");
 let memoryText = $state("");
 let enctype = $state("base64");
 </script>
-<main class="container">
+<header class="container">
 	<nav>
-	<ul>
-		<li><h1><strong>WebCrypt.</strong></h1></li>
-	</ul>
-</nav>
+		<ul>
+			<li><h1><strong>WebCrypt</strong></h1></li>
+		</ul>
+	</nav>
+</header>
+<main class="container">
 	<form role="group">
 		<textarea class="source" placeholder="처리할 텍스트를 입력해주세요." bind:value={sourceText}></textarea>
 		<button type="button" onclick={() => {
@@ -57,10 +59,13 @@ let enctype = $state("base64");
 			<textarea class="result" name="read-only" readonly>{resultText}</textarea>
 			<button type="button" onclick={() => navigator.clipboard.writeText(resultText)}>복사</button>
 	</form>
-	<button type="button" onclick={() => sourceText = resultText}>처리 필드로 이동</button>
-	<button type="button" onclick={() => memoryText += resultText}>메모리에 추가</button>
+	<button type="button" onclick={() => sourceText = resultText}>↑ 처리 필드로 이동</button>
+	<button type="button" onclick={() => memoryText += resultText}>메모리에 추가 ↓</button>
 	<form role="group">
 		<textarea class="memory" placeholder="메모리" bind:value={memoryText}></textarea>
 		<button type="button" onclick={() => navigator.clipboard.writeText(memoryText)}>메모리 복사</button>
 	</form>
 </main>
+<footer class="container">
+	<p>이 도구는 클라이언트 측에서만 작동하며, 어떠한 데이터도 서버로 전송되지 않습니다.</p>
+</footer>
