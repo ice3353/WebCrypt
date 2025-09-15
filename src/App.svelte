@@ -42,7 +42,7 @@ let enctype = $state("base64");
 			}}>디코딩</button>
 	{:else if enctype === "inv"}
 		<button type="button" onclick={() => resultText = inv_encode(to_base64(sourceText))}>인코딩</button>
-		<button type="button" onclick={() => resultText = from_base64(inv_decode(sourceText))}>디코딩</button>
+		<button type="button" onclick={() => resultText = from_base64(inv_decode(ext_encode(sourceText)))}>디코딩</button>
 	{:else if enctype === "rawinv"}
 		아스키 범위 밖의 문자열 사용 시 투명하지 않을 수 있습니다. 다만 기본 투명 인코딩에 비해 글자 수를 줄일 수 있습니다.<br>
 		<button type="button" onclick={() => resultText = inv_encode(sourceText)}>인코딩</button>
