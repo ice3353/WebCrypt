@@ -30,7 +30,7 @@ let enctype = $state("base64");
 			}
 		}}>붙여넣기</button>
 	</form>
-	<select bind:value={enctype} name="처리 알고리즘">
+	<select bind:value={enctype} aria-label="처리 알고리즘">
 		<option value="base64">Base64</option>
 		<option value="rawinv">투명 인코딩</option>
 		<option value="inv">투명 인코딩 With Base64</option>
