@@ -1,0 +1,21 @@
+{
+  "short_name": "WebCrypt",
+  "name": "WebCrypt",
+  "icons": [
+    {
+      "src": "/favicon.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "/favicon.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": "/",
+  "background_color": "#13171f",
+  "display": "standalone",
+  "scope": "/",
+  "theme_color": "#13171f"
+}
