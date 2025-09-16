@@ -1,6 +1,6 @@
 <script>
 import init, { ext_encode, inv_encode, inv_decode, inv_detect, to_base64, from_base64 } from './encodedecode.js';
-import { createMessage, encrypt, readMessage, decrypt } from 'openpgp';
+import { createMessage, encrypt, readMessage, decrypt } from 'openpgp/lightweight';
 async function run() {
 await init();
 }
