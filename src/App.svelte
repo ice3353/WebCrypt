@@ -34,7 +34,7 @@ let enctype = $state("base64");
 		<option value="base64">Base64</option>
 		<option value="rawinv">투명 인코딩</option>
 		<option value="inv">투명 인코딩 With Base64</option>
-		<option value="aes256">PGP-대칭 암호</option>
+		<option value="aes256">PGP - 대칭 암호</option>
 	</select>
 	{#if enctype === "base64"}
 		<button type="button" onclick={() => resultText = to_base64(sourceText)}>인코딩</button>
@@ -73,6 +73,15 @@ let enctype = $state("base64");
 			});
 			resultText = encrypted;
 		}}>암호화</button>
+		<button type="button" onclick={ async () => {
+			const message = await createMessage({ text: sourceText });
+			console.log(message);
+			const encrypted = await encrypt({
+				message,
+				passwords: [keyText]
+			});
+			resultText = inv_encode(encrypted);
+		}}>투명 암호화</button>
 		<button type="button" onclick={async () => {
 			try{
 				const message = await readMessage({ armoredMessage: sourceText });
@@ -97,7 +106,8 @@ let enctype = $state("base64");
 	<form role="group">
 		<textarea class="memory" placeholder="메모리" bind:value={memoryText}></textarea>
 		<button type="button" onclick={() => navigator.clipboard.writeText(memoryText)}>메모리 복사</button>
-	</form><br>
+	</form>
+	<button type="button" onclick={() => sourceText = memoryText}>↑ 처리 필드로 이동</button><br>
 	<fieldset>
 		<label>
 			<input type="checkbox" role="switch" bind:checked={autoDetect} />
