@@ -55,7 +55,7 @@ let enctype = $state("base64");
 		<button type="button" onclick={() => resultText = from_base64(inv_decode(ext_encode(sourceText)))}>디코딩</button>
 	{:else if enctype === "aes256"}
 		<form role="group">			
-			<textarea class="key" placeholder="암호화/복호화 키" bind:value={keyText}></textarea>
+			<textarea class="key" placeholder="암호" bind:value={keyText}></textarea>
 			<button type="button" onclick={() => {
 				try {
 					navigator.clipboard.readText().then(text => keyText = text);
