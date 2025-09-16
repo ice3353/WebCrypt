@@ -10,9 +10,6 @@ module.exports = {
 		'build/bundle': ['./src/main.js']
 	},
 	resolve: {
-	//	alias: {
-	//		svelte: path.resolve('node_modules', 'svelte/src/runtime')
-	//	},
 		extensions: ['.mjs', '.js', '.svelte'],
 		mainFields: ['svelte', 'browser', 'module', 'main'],
 		conditionNames: ['svelte', 'browser']
@@ -20,7 +17,8 @@ module.exports = {
 	output: {
 		path: path.join(__dirname, '/public'),
 		filename: '[name].js',
-		chunkFilename: '[name].[id].js'
+		chunkFilename: '[name].[id].js',
+		assetModuleFilename: 'build/[name][ext]'
 	},
 	module: {
 		rules: [
