@@ -12,14 +12,16 @@ let keyText = $state("");
 let autoDetect = $state(false);
 let enctype = $state("base64");
 </script>
-<header class="container">
+<main class="container">
 	<nav>
 		<ul>
 			<li><h1><strong>WebCrypt</strong></h1></li>
 		</ul>
+		<ul>
+			<li><a href="https://freecommunity.kro.kr">자유 커뮤니티 위키</a></li>
+			<li><a href="https://goroawase.kro.kr">고로아와세 변환기</a></li>
+		</ul>
 	</nav>
-</header>
-<main class="container">
 	<form role="group">
 		<textarea class="source" placeholder="처리할 텍스트를 입력해주세요." bind:value={sourceText} aria-invalid={autoDetect && inv_detect(sourceText) ? "false" : null}></textarea>
 		<button type="button" onclick={() => {
