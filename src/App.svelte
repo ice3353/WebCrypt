@@ -10,6 +10,7 @@ let resultText = $state("");
 let memoryText = $state("");
 let keyText = $state("");
 let autoDetect = $state(false);
+let B64Invisible = $state(false)
 let enctype = $state("base64");
 </script>
 <main class="container">
@@ -34,13 +35,11 @@ let enctype = $state("base64");
 	</form>
 	<select bind:value={enctype} aria-label="처리 알고리즘">
 		<option value="base64">Base64</option>
-		<option value="rawinv">투명 인코딩</option>
-		<option value="inv">투명 인코딩 With Base64</option>
+		<option value="inv">투명 인코딩</option>
 		<option value="aes256">PGP - 대칭 암호</option>
 	</select>
 	{#if enctype === "base64"}
 		<button type="button" onclick={() => resultText = to_base64(sourceText)}>인코딩</button>
-		<button type="button" onclick={() => resultText = inv_encode(to_base64(sourceText))}>투명 인코딩</button>
 		<button type="button" onclick={() => {
 			try{
 				resultText = from_base64(sourceText)
@@ -48,56 +47,58 @@ let enctype = $state("base64");
 				resultText = "디코딩 실패: 올바른 Base64 문자열이 아닙니다."
 			}
 		}}>디코딩</button>
-	{:else if enctype === "rawinv"}
-		아스키 범위 밖의 문자열 사용 시 투명하지 않을 수 있습니다. 다만 투명 인코딩 With Base64에 비해 글자 수를 줄일 수 있습니다.<br>
-		<button type="button" onclick={() => resultText = inv_encode(sourceText)}>인코딩</button>
-		<button type="button" onclick={() => resultText = inv_decode(sourceText)}>디코딩</button>
 	{:else if enctype === "inv"}
-		<button type="button" onclick={() => resultText = inv_encode(to_base64(sourceText))}>인코딩</button>
-		<button type="button" onclick={() => resultText = from_base64(inv_decode(ext_encode(sourceText)))}>디코딩</button>
+	<button type="button" onclick={() => resultText = B64Invisible ? inv_encode(to_base64(sourceText)) : inv_encode(sourceText)}>인코딩</button>
+	<button type="button" onclick={() => resultText = B64Invisible ? from_base64(inv_decode(ext_encode(sourceText))) : inv_decode(sourceText)}>디코딩</button>
+	<fieldset>
+		<label>
+			<input type="checkbox" role="switch" bind:checked={B64Invisible} />
+			<span data-tooltip="문자를 Base64로 먼저 인코딩하여 ASCII 범위 외에서도 투명 상태를 유지합니다.">Base64 래핑</span>
+		</label>
+	</fieldset>
 	{:else if enctype === "aes256"}
-		<form role="group">			
-			<textarea class="key" placeholder="암호" bind:value={keyText}></textarea>
-			<button type="button" onclick={() => {
-				try {
-					navigator.clipboard.readText().then(text => keyText = text);
-				} catch (err) {
-					keyText = '클립보드 읽기 실패: ' + err;
-				}
-			}}>붙여넣기</button>
-		</form>
-		<button type="button" onclick={ async () => {
-			const message = await createMessage({ text: sourceText });
-			console.log(message);
-			const encrypted = await encrypt({
-				message,
-				passwords: [keyText]
-			});
-			resultText = encrypted;
-		}}>암호화</button>
-		<button type="button" onclick={ async () => {
-			const message = await createMessage({ text: sourceText });
-			console.log(message);
-			const encrypted = await encrypt({
-				message,
-				passwords: [keyText]
-			});
-			resultText = inv_encode(encrypted);
-		}}>투명 암호화</button>
-		<button type="button" onclick={async () => {
-			try{
-				const message = await readMessage({ armoredMessage: sourceText });
-				const { data: decrypted } = await decrypt({
-					message,
-					passwords: [keyText],
-				});
-				resultText = decrypted;
-			} catch(err) {
-				resultText = "오류:" + err;
+	<form role="group">			
+		<textarea class="key" placeholder="암호" bind:value={keyText}></textarea>
+		<button type="button" onclick={() => {
+			try {
+				navigator.clipboard.readText().then(text => keyText = text);
+			} catch (err) {
+				keyText = '클립보드 읽기 실패: ' + err;
 			}
-		}}>복호화</button>
+		}}>붙여넣기</button>
+	</form>
+	<button type="button" onclick={ async () => {
+		const message = await createMessage({ text: sourceText });
+		console.log(message);
+		const encrypted = await encrypt({
+			message,
+			passwords: [keyText]
+		});
+		resultText = encrypted;
+	}}>암호화</button>
+	<button type="button" onclick={ async () => {
+		const message = await createMessage({ text: sourceText });
+		console.log(message);
+		const encrypted = await encrypt({
+			message,
+			passwords: [keyText]
+		});
+		resultText = inv_encode(encrypted);
+	}}>투명 암호화</button>
+	<button type="button" onclick={async () => {
+		try{
+			const message = await readMessage({ armoredMessage: sourceText });
+			const { data: decrypted } = await decrypt({
+				message,
+				passwords: [keyText],
+			});
+			resultText = decrypted;
+		} catch(err) {
+			resultText = "오류:" + err;
+		}
+	}}>복호화</button>
 	{:else}
-		<p>이것이 보인다면 무언가 잘못된 것이니 사이트 개발자에게 알려주십시오</p>
+	<p>이것이 보인다면 무언가 잘못된 것이니 사이트 개발자에게 알려주십시오</p>
 	{/if}
 	<form role="group">
 			<textarea class="result" name="read-only" readonly>{resultText}</textarea>
