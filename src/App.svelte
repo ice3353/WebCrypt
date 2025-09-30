@@ -1,5 +1,5 @@
 <script>
-import init, { ext_encode, inv_encode, inv_decode, inv_detect, to_base64, from_base64 } from './encodedecode.js';
+import init, { ext_encode, inv_encode, inv_decode, inv_detect, to_base64, from_base64, to_unicode_escape, from_unicode_escape, encrypt_aes256_cbc, decrypt_aes256_cbc } from './encodedecode.js';
 import { createMessage, encrypt, readMessage, decrypt } from 'openpgp/lightweight';
 async function run() {
 await init();
@@ -36,7 +36,9 @@ let enctype = $state("base64");
 	<select bind:value={enctype} aria-label="처리 알고리즘">
 		<option value="base64">Base64</option>
 		<option value="inv">투명 인코딩</option>
-		<option value="aes256">PGP - 대칭 암호</option>
+		<option value="unicode">유니코드 이스케이프</option>
+		<option value="aes">AES256</option>
+		<option value="pgp">대칭 암호(Legacy)</option>
 	</select>
 	{#if enctype === "base64"}
 		<button type="button" onclick={() => resultText = to_base64(sourceText)}>인코딩</button>
@@ -56,7 +58,23 @@ let enctype = $state("base64");
 			<span data-tooltip="문자를 Base64로 먼저 인코딩하여 ASCII 범위 외에서도 투명 상태를 유지합니다.">Base64 래핑</span>
 		</label>
 	</fieldset>
-	{:else if enctype === "aes256"}
+	{:else if enctype === 'unicode'}
+	<button type="button" onclick={() => resultText = to_unicode_escape(sourceText)}>인코딩</button>
+	<button type="button" onclick={() => resultText = from_unicode_escape(sourceText)}>디코딩</button>
+	{:else if enctype === 'aes'}
+	<form role="group">			
+		<textarea class="key" placeholder="암호" bind:value={keyText}></textarea>
+		<button type="button" onclick={() => {
+			try {
+				navigator.clipboard.readText().then(text => keyText = text);
+			} catch (err) {
+				keyText = '클립보드 읽기 실패: ' + err;
+			}
+		}}>붙여넣기</button>
+	</form>
+	<button type="button" onclick={() => resultText = encrypt_aes256_cbc(sourceText, keyText)}>암호화</button>
+	<button type="button" onclick={() => {try { resultText = decrypt_aes256_cbc(sourceText, keyText) } catch(e) { resultText = '복호화 실패: ' + e }}}>복호화</button>
+	{:else if enctype === "pgp"}
 	<form role="group">			
 		<textarea class="key" placeholder="암호" bind:value={keyText}></textarea>
 		<button type="button" onclick={() => {
@@ -118,6 +136,3 @@ let enctype = $state("base64");
 		</label>
 	</fieldset>
 </main>
-<footer class="container">
-	<p>이 도구는 클라이언트 측에서만 작동하며, 어떠한 데이터도 서버로 전송되지 않습니다.</p>
-</footer>
