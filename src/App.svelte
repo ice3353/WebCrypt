@@ -1,17 +1,26 @@
 <script>
 import init, { ext_encode, inv_encode, inv_decode, inv_detect, to_base64, from_base64, to_unicode_escape, from_unicode_escape, encrypt_aes256_cbc, decrypt_aes256_cbc } from './encodedecode.js';
 import { createMessage, encrypt, readMessage, decrypt } from 'openpgp/lightweight';
-async function run() {
-await init();
-}
-run();
+import queryString from 'query-string';
+init()
+let query = queryString.parse(location.search, {parseBooleans: true, types: { keyText: "string", autoDetect: "boolean", B64Invisible: "boolean", encrypt: 'string' }});
+
 let sourceText = $state("");
 let resultText = $state("");
 let memoryText = $state("");
-let keyText = $state("");
-let autoDetect = $state(false);
-let B64Invisible = $state(false)
-let enctype = $state("base64");
+let keyText = $state(query.keyText ? query.keyText : "");
+let autoDetect = $state(query.autoDetect ? query.autoDetect : false);
+let B64Invisible = $state(query.B64Invisible ? query.B64Invisible : false)
+let enctype = $state(query.enctype ? query.enctype : "base64");
+
+// function setUrl() {
+// 	let status = $state({})
+// 	keyText ? status.keyText = keyText : null
+// 	autoDetect ? status.autoDetect = autoDetect : null
+// 	B64Invisible ? status.B64Invisible = B64Invisible : null
+// 	enctype = 'base64' ? null : status.enctype = enctype
+// 	console.log(status)
+// }
 </script>
 <main class="container">
 	<nav>
@@ -37,8 +46,8 @@ let enctype = $state("base64");
 		<option value="base64">Base64</option>
 		<option value="inv">투명 인코딩</option>
 		<option value="unicode">유니코드 이스케이프</option>
-		<option value="aes">AES256</option>
-		<option value="pgp">대칭 암호(Legacy)</option>
+		<option value="aes">AES 암호</option>
+		<option value="pgp">PGP-대칭(삭제 예정)</option>
 	</select>
 	{#if enctype === "base64"}
 		<button type="button" onclick={() => resultText = to_base64(sourceText)}>인코딩</button>
@@ -116,7 +125,7 @@ let enctype = $state("base64");
 		}
 	}}>복호화</button>
 	{:else}
-	<p>이것이 보인다면 무언가 잘못된 것이니 사이트 개발자에게 알려주십시오</p>
+	<p>방식 "${enctype}"은 존재하지 않습니다.</p>
 	{/if}
 	<form role="group">
 			<textarea class="result" name="read-only" readonly>{resultText}</textarea>
