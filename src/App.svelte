@@ -1,6 +1,5 @@
 <script>
 import init, { ext_encode, inv_encode, inv_decode, inv_detect, to_base64, from_base64, to_unicode_escape, from_unicode_escape, encrypt_aes256_cbc, decrypt_aes256_cbc } from './encodedecode.js';
-import { createMessage, encrypt, readMessage, decrypt } from 'openpgp/lightweight';
 import queryString from 'query-string';
 init()
 let query = queryString.parse(location.search, {parseBooleans: true, types: { keyText: "string", autoDetect: "boolean", B64Invisible: "boolean", encrypt: 'string' }});
@@ -47,7 +46,6 @@ let enctype = $state(query.enctype ? query.enctype : "base64");
 		<option value="inv">투명 인코딩</option>
 		<option value="unicode">유니코드 이스케이프</option>
 		<option value="aes">AES 암호</option>
-		<option value="pgp">PGP-대칭(삭제 예정)</option>
 	</select>
 	{#if enctype === "base64"}
 		<button type="button" onclick={() => resultText = to_base64(sourceText)}>인코딩</button>
@@ -83,47 +81,6 @@ let enctype = $state(query.enctype ? query.enctype : "base64");
 	</form>
 	<button type="button" onclick={() => resultText = encrypt_aes256_cbc(sourceText, keyText)}>암호화</button>
 	<button type="button" onclick={() => {try { resultText = decrypt_aes256_cbc(sourceText, keyText) } catch(e) { resultText = '복호화 실패: ' + e }}}>복호화</button>
-	{:else if enctype === "pgp"}
-	<form role="group">			
-		<textarea class="key" placeholder="암호" bind:value={keyText}></textarea>
-		<button type="button" onclick={() => {
-			try {
-				navigator.clipboard.readText().then(text => keyText = text);
-			} catch (err) {
-				keyText = '클립보드 읽기 실패: ' + err;
-			}
-		}}>붙여넣기</button>
-	</form>
-	<button type="button" onclick={ async () => {
-		const message = await createMessage({ text: sourceText });
-		console.log(message);
-		const encrypted = await encrypt({
-			message,
-			passwords: [keyText]
-		});
-		resultText = encrypted;
-	}}>암호화</button>
-	<button type="button" onclick={ async () => {
-		const message = await createMessage({ text: sourceText });
-		console.log(message);
-		const encrypted = await encrypt({
-			message,
-			passwords: [keyText]
-		});
-		resultText = inv_encode(encrypted);
-	}}>투명 암호화</button>
-	<button type="button" onclick={async () => {
-		try{
-			const message = await readMessage({ armoredMessage: sourceText });
-			const { data: decrypted } = await decrypt({
-				message,
-				passwords: [keyText],
-			});
-			resultText = decrypted;
-		} catch(err) {
-			resultText = "오류:" + err;
-		}
-	}}>복호화</button>
 	{:else}
 	<p>방식 "${enctype}"은 존재하지 않습니다.</p>
 	{/if}
