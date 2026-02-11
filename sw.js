@@ -1,4 +1,4 @@
-const CACHE_NAME = 'webcrypt-cache-v2.3.1';
+const CACHE_NAME = 'webcrypt-cache-v2.4';
 const urlsToCache = [
   '/',
   '/build/bundle.js',
