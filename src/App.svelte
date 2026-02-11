@@ -1,6 +1,7 @@
 <script>
 import init, { ext_encode, inv_encode, inv_decode, inv_detect, to_base64, from_base64, to_unicode_escape, from_unicode_escape, encrypt_aes256_cbc, decrypt_aes256_cbc } from './encodedecode.js';
 import queryString from 'query-string';
+import { to_basehangul, from_basehangul } from './basehangul.js';
 init()
 let query = queryString.parse(location.search, {parseBooleans: true, types: { keyText: "string", autoDetect: "boolean", B64Invisible: "boolean", encrypt: 'string' }});
 
@@ -43,6 +44,7 @@ let enctype = $state(query.enctype ? query.enctype : "base64");
 	</form>
 	<select bind:value={enctype} aria-label="처리 알고리즘">
 		<option value="base64">Base64</option>
+		<option value="basehangul">basehangul</option>
 		<option value="inv">투명 인코딩</option>
 		<option value="unicode">유니코드 이스케이프</option>
 		<option value="aes">AES 암호</option>
@@ -56,6 +58,9 @@ let enctype = $state(query.enctype ? query.enctype : "base64");
 				resultText = "디코딩 실패: 올바른 Base64 문자열이 아닙니다."
 			}
 		}}>디코딩</button>
+	{:else if enctype === "basehangul"}
+		<button type="button" onclick={() => resultText = to_basehangul(sourceText)}>인코딩</button>
+		<button type="button" onclick={() => resultText = from_basehangul(sourceText)}>디코딩</button>
 	{:else if enctype === "inv"}
 	<button type="button" onclick={() => resultText = B64Invisible ? inv_encode(to_base64(sourceText)) : inv_encode(sourceText)}>인코딩</button>
 	<button type="button" onclick={() => resultText = B64Invisible ? from_base64(inv_decode(ext_encode(sourceText))) : inv_decode(sourceText)}>디코딩</button>
