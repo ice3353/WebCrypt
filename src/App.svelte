@@ -2,6 +2,8 @@
 import init, { ext_encode, inv_encode, inv_decode, inv_detect, to_base64, from_base64, to_unicode_escape, from_unicode_escape, encrypt_aes256_cbc, decrypt_aes256_cbc } from './encodedecode.js';
 import queryString from 'query-string';
 import { to_basehangul, from_basehangul } from './basehangul.js';
+import UnicodeSteganographer from './unicode_steganography.js';
+const Steganographer = new UnicodeSteganographer();
 init()
 let query = queryString.parse(location.search, {parseBooleans: true, types: { keyText: "string", autoDetect: "boolean", B64Invisible: "boolean", encrypt: 'string' }});
 
@@ -33,7 +35,7 @@ let enctype = $state(query.enctype ? query.enctype : "base64");
 		</ul>
 	</nav>
 	<form role="group">
-		<textarea class="source" placeholder="처리할 텍스트를 입력해주세요." bind:value={sourceText} aria-invalid={autoDetect && inv_detect(sourceText) ? "false" : null}></textarea>
+		<textarea class="source" placeholder="난독화/암호화할 텍스트를 입력해주세요." bind:value={sourceText} aria-invalid={autoDetect && inv_detect(sourceText) ? "false" : null}></textarea>
 		<button type="button" onclick={() => {
 			try {
 				navigator.clipboard.readText().then(text => sourceText = text);
@@ -46,6 +48,7 @@ let enctype = $state(query.enctype ? query.enctype : "base64");
 		<option value="base64">Base64</option>
 		<option value="basehangul">basehangul</option>
 		<option value="inv">투명 인코딩</option>
+		<option value="txtst">텍스트 스테가노그래피</option>
 		<option value="unicode">유니코드 이스케이프</option>
 		<option value="aes">AES 암호</option>
 	</select>
@@ -70,6 +73,19 @@ let enctype = $state(query.enctype ? query.enctype : "base64");
 			<span data-tooltip="문자를 Base64로 먼저 인코딩하여 ASCII 범위 외에서도 투명 상태를 유지합니다.">Base64 래핑</span>
 		</label>
 	</fieldset>
+	{:else if enctype === 'txtst'}
+	<form role="group">			
+		<textarea class="key" placeholder="표시 텍스트" bind:value={keyText}></textarea>
+		<button type="button" onclick={() => {
+			try {
+				navigator.clipboard.readText().then(text => keyText = text);
+			} catch (err) {
+				keyText = '클립보드 읽기 실패: ' + err;
+			}
+		}}>붙여넣기</button>
+	</form>
+	<button type="button" onclick={() => resultText = Steganographer.encodeText(keyText, sourceText)}>숨기기</button>
+	<button type="button" onclick={() => resultText = Steganographer.decodeText(sourceText).hiddenText}>보이기</button>
 	{:else if enctype === 'unicode'}
 	<button type="button" onclick={() => resultText = to_unicode_escape(sourceText)}>인코딩</button>
 	<button type="button" onclick={() => resultText = from_unicode_escape(sourceText)}>디코딩</button>
@@ -87,7 +103,7 @@ let enctype = $state(query.enctype ? query.enctype : "base64");
 	<button type="button" onclick={() => resultText = encrypt_aes256_cbc(sourceText, keyText)}>암호화</button>
 	<button type="button" onclick={() => {try { resultText = decrypt_aes256_cbc(sourceText, keyText) } catch(e) { resultText = '복호화 실패: ' + e }}}>복호화</button>
 	{:else}
-	<p>방식 "${enctype}"은 존재하지 않습니다.</p>
+	<p>방식 "${enctype}" 타입은 존재하지 않습니다.</p>
 	{/if}
 	<form role="group">
 			<textarea class="result" name="read-only" readonly>{resultText}</textarea>
