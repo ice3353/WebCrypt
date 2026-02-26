@@ -84,8 +84,8 @@ let enctype = $state(query.enctype ? query.enctype : "base64");
 			}
 		}}>붙여넣기</button>
 	</form>
-	<button type="button" onclick={() => resultText = Steganographer.encodeText(keyText, sourceText)}>숨기기</button>
-	<button type="button" onclick={() => resultText = Steganographer.decodeText(sourceText).hiddenText}>보이기</button>
+	<button type="button" onclick={() => resultText = Steganographer.encodeText(keyText, sourceText)}>삽입하기</button>
+	<button type="button" onclick={() => resultText = Steganographer.decodeText(sourceText).hiddenText}>추출하기</button>
 	{:else if enctype === 'unicode'}
 	<button type="button" onclick={() => resultText = to_unicode_escape(sourceText)}>인코딩</button>
 	<button type="button" onclick={() => resultText = from_unicode_escape(sourceText)}>디코딩</button>
